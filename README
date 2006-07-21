@@ -1,4 +1,62 @@
 ActsAsConfigurable
 ==================
 
-Description goes here
+This is the ActsAsConfigurable plugin.  It allows you to add
+user-defined setting values to your models, as well as default
+fallback values.  Usage is simple, just type
+
+  acts_as_configurable [:column], [Type]
+  
+where :column is the name of the text column to store your
+settings in (default is :settings), and Type is the type of
+data to store the settings as (default is Hash, but you
+could also use HashWithIndifferentAccess).
+
+Now that you've defined your model as configurable, you can
+add fields using the setting method like so:
+
+  setting :string_setting, :string, 'This is the default value'
+  setting :boolean_setting, :boolean, true
+  
+where :string_value is the name of the setting, :string 
+is the type, and the last value is the default value.  The
+type can be any one of the following:
+
+  :bool,  :boolean = boolean values
+  :int,   :integer = integer values
+  :float           = floating-point values
+  :str,   :string  = string values
+  :yml,   :yaml    = YAML values
+  :object          = any object (ActiveRecord must be able to serialize it)
+  
+Going back to our example setting earlier, you may access
+the example setting's value using:
+
+  # This will return 'This is the default value'.
+  @instance.string_setting
+  
+In addition, boolean settings will also be given a question
+mark method like this:
+
+  # These will both return true.
+  @instance.boolean_setting
+  @instance.boolean_setting?
+  
+To change the setting to a new value, use:
+
+  # This will set the string setting's
+  # value to 'New value'.
+  @instance.string_setting = 'New value'
+
+  # This will set the boolean setting's
+  # value to false.
+  @instance.boolean_setting = false
+  
+We've been using strings up to this point, but there's no
+reason why you couldn't do the same thing with integers,
+floats, booleans, arrays, hashes, or any other object
+that ActiveRecord can serialize.
+
+Note that when you change a setting's value, the record is
+automatically saved unless it's a new record that doesn't
+yet exist in the database.
