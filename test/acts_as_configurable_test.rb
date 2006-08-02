@@ -3,7 +3,7 @@ require "#{File.dirname(__FILE__)}/mocks/model"
 
 class ActsAsConfigurableTest < Test::Unit::TestCase
   def setup
-  	@model = Mocks::Model.new
+  	@model = Test::ActiveRecord::Model.new
   end
 
   def test_setting_readers
