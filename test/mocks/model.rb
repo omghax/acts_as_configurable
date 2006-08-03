@@ -6,9 +6,6 @@ class Hash
 	end
 end
 
-class HashWithIndifferentAccess < Hash
-end
-
 module Test
   module ActiveRecord
     class Base
@@ -52,7 +49,7 @@ module Test
     class Model < Base
       attr_accessor :settings
 
-      acts_as_configurable :type => Hash
+      acts_as_configurable
 
       setting :string1, :type => :string, :default => 'string1'
       setting :string2, :type => :str, :default => 'string2'

@@ -149,7 +149,7 @@ module ActsAsConfigurable
     	
     	def initialize(key, options = {})
       	options = {:type => :object, :default => nil}.update(options.symbolize_keys)
-      	@key, @ruby_type, @default = key.to_sym, options[:type].to_sym, options[:default]
+      	@key, @ruby_type, @default = key.to_s, options[:type].to_sym, options[:default]
     	end
     	
     	def canonicalize(value)
