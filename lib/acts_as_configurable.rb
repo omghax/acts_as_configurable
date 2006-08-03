@@ -4,12 +4,12 @@
 # user-defined setting values to your models, as well as default
 # fallback values.  Usage is simple, just type
 # 
-#   acts_as_configurable [:using => :settings], [:type => HashWithIndifferentAccess], [:autosave => true]
+#   acts_as_configurable [:using => :settings], [:type => Hash], [:autosave => true]
 #
 # where :using is the name of the text column to store your
 # settings in (default is :settings), :type is the type of
-# data to store the settings as (default is HashWithIndifferentAccess,
-# but you could also use a plain Hash), and :autosave is
+# data to store the settings as (default is Hash, but you could
+# also use a HashWithIndifferentAccess), and :autosave is
 # whether or not you'd like a save each record when its settings
 # are changed (default is true).
 # 
@@ -196,7 +196,7 @@ module ActsAsConfigurable
     #     when a setting is changed (default: true).
     #
     def acts_as_configurable(options = {})
-    	options = {:using => :settings, :type => HashWithIndifferentAccess, :autosave => true}.update(options.symbolize_keys)
+    	options = {:using => :settings, :type => Hash, :autosave => true}.update(options.symbolize_keys)
     	write_inheritable_hash(:acts_as_configurable_options, options)
     	class_inheritable_reader :acts_as_configurable_options
       serialize(options[:using], options[:type])
