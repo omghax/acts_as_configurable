@@ -47,13 +47,9 @@ module ActsAsConfigurable
     def add_setting_writer(item) # :nodoc:
     	define_method("#{item.key}=") do |new_value|
     	  column = send(acts_as_configurable_options[:using])
-    	  column ||= send("#{acts_as_configurable_options[:using]}=", acts_as_configurable_options[:type].new)
+    	  column ||= send("#{acts_as_configurable_options[:using]}=", Hash.new)
         new_value = item.canonicalize(new_value)
-        unless column[item.key] == new_value
-      	  column[item.key] = new_value
-      	  save if acts_as_configurable_options[:autosave] and not new_record?
-        end
-    	  new_value
+    	  column[item.key] = new_value
     	end
     end
     
@@ -97,18 +93,18 @@ module ActsAsConfigurable
     # values, using a text column to store a serialized
     # Hash of setting keys and values.
     # 
-    # Example:
-    #   acts_as_configurable :using => :settings
+    # Examples:
+    #   # Will use the :preferences column
+    #   acts_as_configurable :using => :preferences
+    # 
+    #   # Will use the :settings column
+    #   acts_as_configurable
     # 
     # Options:
-    # [using]     The name of the text column where your settings will be
-    #             stored.  Defaults to :settings.
-    # [autosave]  Specifies whether or not you would like to save the
-    #             record every time a setting is changed.  This is only
-    #             active in existing records, so you won't risk saving
-    #             a new record before you're ready.  Defaults to false.
+    # [using] The name of the text column where your settings will be
+    #         stored.  Defaults to :settings.
     def acts_as_configurable(options = {})
-      options.symbolize_keys!.reverse_merge!(:using => :settings, :type => Hash, :autosave => true)
+      options.symbolize_keys!.reverse_merge!(:using => :settings)
     	write_inheritable_hash(:acts_as_configurable_options, options)
     	class_inheritable_reader :acts_as_configurable_options
       serialize(options[:using], Hash)
