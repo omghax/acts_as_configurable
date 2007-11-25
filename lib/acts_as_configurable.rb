@@ -1,5 +1,34 @@
 module ActsAsConfigurable
+  def self.included(base) # :nodoc:
+    super
+    base.extend(ClassMethods)
+  end
+
   private
+
+  module ClassMethods
+    # This act provides user-defined settings with default
+    # values, using a text column to store a serialized
+    # Hash of setting keys and values.
+    # 
+    # Examples:
+    #   # Will use the :preferences column
+    #   acts_as_configurable :using => :preferences
+    # 
+    #   # Will use the :settings column
+    #   acts_as_configurable
+    # 
+    # Options:
+    # [using] The name of the text column where your settings will be
+    #         stored.  Defaults to :settings.
+    def acts_as_configurable(options = {})
+      options.symbolize_keys!.reverse_merge!(:using => :settings)
+    	write_inheritable_hash(:acts_as_configurable_options, options)
+    	class_inheritable_reader :acts_as_configurable_options
+      serialize(options[:using], Hash)
+    	extend SingletonMethods
+    end
+  end
   
   module SingletonMethods
     # Define a setting.
@@ -35,21 +64,16 @@ module ActsAsConfigurable
     
     def add_setting_reader(item) # :nodoc:
     	define_method(item.key) do
-    		raw = send(acts_as_configurable_options[:using])[item.key] rescue nil
-    		raw.nil? ? item.default : raw
+        column = send(acts_as_configurable_options[:using])
+        column && column.has_key?(item.key) ? column[item.key] : item.default
     	end
-      define_method("#{item.key}?") do
-        raw = send(acts_as_configurable_options[:using])[item.key] rescue nil
-        !raw.blank?
-      end
+      define_method("#{item.key}?") { !send(item.key).blank? }
     end
 
     def add_setting_writer(item) # :nodoc:
-    	define_method("#{item.key}=") do |new_value|
-    	  column = send(acts_as_configurable_options[:using])
-    	  column ||= send("#{acts_as_configurable_options[:using]}=", Hash.new)
-        new_value = item.canonicalize(new_value)
-    	  column[item.key] = new_value
+    	define_method("#{item.key}=") do |value|
+    	  column = send(acts_as_configurable_options[:using]) || send("#{acts_as_configurable_options[:using]}=", Hash.new)
+    	  column[item.key] = item.canonicalize(value)
     	end
     end
     
@@ -82,40 +106,5 @@ module ActsAsConfigurable
     		end
     	end
     end
-  end
-end
-
-module ActsAsConfigurable
-  private
-  
-  module ClassMethods
-    # This act provides user-defined settings with default
-    # values, using a text column to store a serialized
-    # Hash of setting keys and values.
-    # 
-    # Examples:
-    #   # Will use the :preferences column
-    #   acts_as_configurable :using => :preferences
-    # 
-    #   # Will use the :settings column
-    #   acts_as_configurable
-    # 
-    # Options:
-    # [using] The name of the text column where your settings will be
-    #         stored.  Defaults to :settings.
-    def acts_as_configurable(options = {})
-      options.symbolize_keys!.reverse_merge!(:using => :settings)
-    	write_inheritable_hash(:acts_as_configurable_options, options)
-    	class_inheritable_reader :acts_as_configurable_options
-      serialize(options[:using], Hash)
-    	extend SingletonMethods
-    end
-  end
-end
-
-module ActsAsConfigurable
-  def self.included(base) # :nodoc:
-    super
-    base.extend(ClassMethods)
   end
 end
