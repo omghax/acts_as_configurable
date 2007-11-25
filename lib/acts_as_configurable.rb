@@ -56,15 +56,12 @@
 #   # This will now return 'New title'.
 #   @site.title
 #
-# == Boolean Settings
-#
-# Settings defined as type :boolean or :bool can also be accessed
-# with a query method, like this:
+# Settings can also be accessed with a query method, like this:
 # 
 #   # These will both return true.
-#   @instance.boolean_setting
-#   @instance.boolean_setting?
-#   
+#   @instance.setting
+#   @instance.setting?
+# 
 # == Saving
 #
 # By default, acts_as_configurable will save a record whenever
@@ -116,19 +113,25 @@ module ActsAsConfigurable
     #   :object          = any object (ActiveRecord must be able to serialize it)
     #
     def setting(key, options = {})
-    	item = Item.new(key, options)
-    	add_setting_reader(item)
-    	add_setting_writer(item)
+      add_setting_accessor(Item.new(key, options))
     end
 
     private
+    
+    def add_setting_accessor(item) # :nodoc:
+    	add_setting_reader(item)
+    	add_setting_writer(item)
+    end
     
     def add_setting_reader(item) # :nodoc:
     	define_method(item.key) do
     		raw = send(acts_as_configurable_options[:using])[item.key] rescue nil
     		raw.nil? ? item.default : raw
     	end
-      alias_method("#{item.key}?", item.key) if [:boolean, :bool].include?(item.ruby_type)
+      define_method("#{item.key}?") do
+        raw = send(acts_as_configurable_options[:using])[item.key] rescue nil
+        !raw.blank?
+      end
     end
 
     def add_setting_writer(item) # :nodoc:
@@ -157,7 +160,11 @@ module ActsAsConfigurable
   			when :boolean, :bool
   			  ![0, '0', '', false, 'false', 'f', nil].include?(value)
 				when :integer, :int
-				  value.is_a?(String) ? value.gsub(/[^0-9\.]/, '').to_i : value.to_i
+          if value.respond_to?(:to_i)
+            value.to_i
+          else
+            value ? 1 : 0
+          end
 				when :float
 				  value.is_a?(String) ? value.gsub(/[^0-9\.]/, '').to_f : value.to_f
 				when :string, :str
