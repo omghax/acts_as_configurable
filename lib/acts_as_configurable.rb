@@ -50,7 +50,7 @@ module ActsAsConfigurable
       items << StringItem.new(name, options)
     end
 
-    # Creates a integer setting with the given +name+.  Any values passed
+    # Creates an integer setting with the given +name+.  Any values passed
     # into this setting will automatically be converted into integers.
     # 
     # Example:
@@ -79,7 +79,7 @@ module ActsAsConfigurable
       items << BooleanItem.new(name, options)
     end
 
-    # Creates a object setting with the given +name+.  Any values passed
+    # Creates an object setting with the given +name+.  Any values passed
     # into this setting will be passed straight through.  This only
     # supports objects that can be serialized by YAML.
     # 
