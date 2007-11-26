@@ -26,7 +26,7 @@ module ActsAsConfigurable
     	write_inheritable_hash(:acts_as_configurable_options, options)
     	class_inheritable_reader :acts_as_configurable_options
       serialize(options[:using], Hash)
-    	extend SingletonMethods
+    	extend(SingletonMethods)
     end
   end
   
@@ -72,7 +72,8 @@ module ActsAsConfigurable
 
     def add_setting_writer(item) # :nodoc:
     	define_method("#{item.key}=") do |value|
-    	  column = send(acts_as_configurable_options[:using]) || send("#{acts_as_configurable_options[:using]}=", Hash.new)
+    	  column = send(acts_as_configurable_options[:using]) ||
+    	    send("#{acts_as_configurable_options[:using]}=", Hash.new)
     	  column[item.key] = item.canonicalize(value)
     	end
     end
