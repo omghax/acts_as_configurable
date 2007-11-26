@@ -137,15 +137,15 @@ module ActsAsConfigurable
     end
   end
 
-  module ActsMethods
+  module ActsMethods # :nodoc:
     private
 
-    def add_setting_accessor(item) # :nodoc:
+    def add_setting_accessor(item)
       add_setting_reader(item)
       add_setting_writer(item)
     end
 
-    def add_setting_reader(item) # :nodoc:
+    def add_setting_reader(item)
       define_method(item.name) do
         column = send(acts_as_configurable_options[:using]) || send("#{acts_as_configurable_options[:using]}=", Hash.new)
         column.has_key?(item.name) ? column[item.name] : item.default
@@ -153,7 +153,7 @@ module ActsAsConfigurable
       define_method("#{item.name}?") { !send(item.name).blank? }
     end
 
-    def add_setting_writer(item) # :nodoc:
+    def add_setting_writer(item)
       define_method("#{item.name}=") do |value|
         column = send(acts_as_configurable_options[:using]) || send("#{acts_as_configurable_options[:using]}=", Hash.new)
         column[item.name] = item.typecast(value)
