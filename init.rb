@@ -1,2 +1,2 @@
-require 'acts_as_configurable'
+require "acts_as_configurable"
 ActiveRecord::Base.send(:include, ActsAsConfigurable)
