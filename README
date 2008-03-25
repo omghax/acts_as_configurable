@@ -1,7 +1,9 @@
 = ActsAsConfigurable
 
-This plugin provides the ability to specify settings on a model class similarly
-to the way columns are defined in migrations, including default values.
+This plugin provides the ability to specify settings on a model class
+similarly to the way columns are defined in migrations, including default
+values. It does this by saving the settings to a TEXT column as a Hash object,
+serialized by YAML.
 
 While you could get the same effect by creating a column for each individual
 setting, this becomes cumbersome when there are more than a handful of
@@ -32,6 +34,17 @@ specified default values.  These attributes can be used in mass-assignment,
 validations, and pretty much anywhere else you'd use a normal database column.
 
 The available types of settings are :string, :integer, :boolean, and :object.
+
+By default, these settings will be stored inside a database column named
+"settings". If you'd prefer to store them elsewhere, use the :using option.
+
+  class Blog < ActiveRecord::Base
+    acts_as_configurable :using => "some_other_column" do |c|
+      ...
+    end
+  end
+
+This column should be a TEXT column.
 
 === Strings
 
