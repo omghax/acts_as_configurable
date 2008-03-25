@@ -1,0 +1,97 @@
+= ActsAsConfigurable
+
+This plugin provides the ability to specify settings on a model class similarly
+to the way columns are defined in migrations, including default values.
+
+While you could get the same effect by creating a column for each individual
+setting, this becomes cumbersome when there are more than a handful of
+settings, or when the settings need to be changed frequently.
+
+== Getting Started
+
+First, install the plugin:
+
+  $ ./script/plugin install git://github.com/omghax/acts_as_configurable.git
+
+Note that git support for script/plugin is, at the time of this writing, only
+available in edge Rails.  With any luck this will make its way into an official
+release soon.
+
+Next, declare acts_as_configurable in your model(s):
+
+  class Blog < ActiveRecord::Base
+    acts_as_configurable do |c|
+      c.string :title, :default => "My Blog"
+      c.integer :number_of_frontpage_articles, :default => 10
+      c.boolean :enable_akismet, :default => false
+    end
+  end
+
+This will define instance methods on Blog for each setting, with the
+specified default values.  These attributes can be used in mass-assignment,
+validations, and pretty much anywhere else you'd use a normal database column.
+
+The available types of settings are :string, :integer, :boolean, and :object.
+
+=== Strings
+
+First let's take a look at string settings. These behave exactly as you would
+expect them to.
+
+  >> b = Blog.new
+  >> b.title
+  => "My Blog"
+  >> b.title = "My Custom Blog"
+  >> b.title
+  => "My Custom Blog"
+
+=== Integers
+
+Integer settings work similarly to string settings, but are obviously coerced
+into integers when their values are set.
+
+=== Booleans
+
+Here's how you deal with boolean settings. Note that these settings are very
+flexible with what they accept during assignment.
+
+[false]
+  nil, 0, "0", "f", "false", false
+[true]
+  anything else
+
+  >> b.enable_akismet?
+  => false
+  >> b.enable_akismet = true
+  >> b.enable_akismet?
+  => true
+
+=== Objects
+
+Object settings are the most flexible, and will allow you to use any
+serializable ruby object to represent a setting's value. This should be used
+with care as changes to your code can potentially break the records in your
+database which contain serialized objects.
+
+== License
+
+Copyright (c) 2008 Dray Lacy
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
