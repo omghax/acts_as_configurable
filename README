@@ -38,12 +38,14 @@ The available types of settings are :string, :integer, :boolean, and :object.
 First let's take a look at string settings. These behave exactly as you would
 expect them to.
 
+Example:
+
   >> b = Blog.new
   >> b.title
-  => "My Blog"
+  # => "My Blog"
   >> b.title = "My Custom Blog"
   >> b.title
-  => "My Custom Blog"
+  # => "My Custom Blog"
 
 === Integers
 
@@ -60,11 +62,13 @@ flexible with what they accept during assignment.
 [true]
   anything else
 
+Example:
+
   >> b.enable_akismet?
-  => false
+  # => false
   >> b.enable_akismet = true
   >> b.enable_akismet?
-  => true
+  # => true
 
 === Objects
 
