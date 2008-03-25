@@ -15,10 +15,6 @@ First, install the plugin:
 
   $ ./script/plugin install git://github.com/omghax/acts_as_configurable.git
 
-Note that git support for script/plugin is, at the time of this writing, only
-available in edge Rails.  With any luck this will make its way into an official
-release soon.
-
 Next, declare acts_as_configurable in your model(s):
 
   class Blog < ActiveRecord::Base
