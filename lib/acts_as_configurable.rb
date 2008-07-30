@@ -155,7 +155,10 @@ module ActsAsConfigurable
 
     def add_setting_writer(item)
       define_method("#{item.name}=") do |value|
-        send(acts_as_configurable_options[:using].to_s + '_will_change!')
+        # Notify ActiveRecord that settings attribute will be dirtied.
+        will_change = "#{acts_as_configurable_options[:using]}_will_change!"
+        send(will_change) if respond_to?(will_change)
+
         column = send(acts_as_configurable_options[:using]) || send("#{acts_as_configurable_options[:using]}=", Hash.new)
         column[item.name] = item.typecast(value)
       end
