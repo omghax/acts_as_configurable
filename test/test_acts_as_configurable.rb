@@ -1,6 +1,7 @@
 require "test/unit"
 require "rubygems"
 require "activerecord"
+require "active_record/version"
 
 $:.unshift File.dirname(__FILE__) + "/../lib"
 require File.dirname(__FILE__) + "/../init"
@@ -36,6 +37,14 @@ class PersonUsingSettings < ActiveRecord::Base
 end
 
 class TestActsAsConfigurable < Test::Unit::TestCase
+  def self.when_ar_version(required_version, test_name)
+    if ActiveRecord::VERSION::STRING >= required_version
+      yield
+    else
+      $stderr.puts "Skipping #{test_name}: ActiveRecord #{required_version} required."
+    end
+  end
+
   def test_serialized_attributes
     assert_equal({"string" => "string", "integer" => 1, "boolean" => true}, PersonUsingPreferences.new(:string => "string", :integer => 1, :boolean => true).preferences)
     assert_equal({"string" => "string", "integer" => 1, "boolean" => true}, PersonUsingSettings.new(:string => "string", :integer => 1, :boolean => true).settings)
@@ -78,5 +87,15 @@ class TestActsAsConfigurable < Test::Unit::TestCase
     assert !PersonUsingSettings.new(:boolean => 0).boolean?
     assert !PersonUsingSettings.new(:boolean => "0").boolean?
     assert !PersonUsingSettings.new(:boolean => nil).boolean?
+  end
+
+  # Dirty attributes only exist in ActiveRecord >= 2.1.0
+  when_ar_version("2.1.0", "dirty attributes test") do
+    def test_changing_attributes_dirties_settings_column
+      person = PersonUsingSettings.create!(:boolean => false)
+      assert ! person.settings_changed?
+      person.boolean = true
+      assert person.settings_changed?
+    end
   end
 end
